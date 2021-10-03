@@ -14,9 +14,9 @@ class Scaner:  # Класс где реализованны функции дл�
         last_node_in_begin_ip = int(self.get_last_node_in_ip(begin_ip))  # перевод поможет
         last_node_in_last_ip = int(self.get_last_node_in_ip(end_ip))
         if last_node_in_begin_ip > last_node_in_last_ip:  # Проверка на то чтобы начальное значение было меньше чем конечное
-            buf_last_node_in_begin_ip = last_node_in_begin_ip
-            last_node_in_begin_ip = last_node_in_last_ip
-            last_node_in_last_ip = buf_last_node_in_begin_ip
+            buf_last_node_in_begin_ip = last_node_in_begin_ip  # Помещаем начальный айпи в буфер, чтобы потом поменять их с конечным
+            last_node_in_begin_ip = last_node_in_last_ip  # Меняем
+            last_node_in_last_ip = buf_last_node_in_begin_ip  # И присваеваем начальный к конечному
 
         for last_node in range(last_node_in_begin_ip, last_node_in_last_ip):
             parsed_begin_ip = self.parse_ip(begin_ip)
@@ -27,7 +27,7 @@ class Scaner:  # Класс где реализованны функции дл�
         if end_port > self.MAX_RANGE_PORT:
             end_port = self.MAX_RANGE_PORT
 
-        if begin_port > end_port:
+        if begin_port > end_port:  # тут тоже самое что и в верху
             buf_begin_port = begin_port
             begin_port = end_port
             end_port = buf_begin_port
