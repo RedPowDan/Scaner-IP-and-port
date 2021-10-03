@@ -12,9 +12,7 @@ class Scaner:
         last_node_in_begin_ip = int(self.get_last_node_in_ip(begin_ip))
         last_node_in_last_ip = int(self.get_last_node_in_ip(end_ip))
         if last_node_in_begin_ip > last_node_in_last_ip:
-            buf_last_node_in_begin_ip = last_node_in_begin_ip
-            last_node_in_begin_ip = last_node_in_last_ip
-            last_node_in_last_ip = buf_last_node_in_begin_ip
+            last_node_in_begin_ip, last_node_in_last_ip = last_node_in_last_ip, last_node_in_begin_ip
 
         for last_node in range(last_node_in_begin_ip, last_node_in_last_ip):
             parsed_begin_ip = self.parse_ip(begin_ip)
@@ -26,13 +24,11 @@ class Scaner:
             end_port = self.MAX_RANGE_PORT
 
         if begin_port > end_port:
-            buf_begin_port = begin_port
-            begin_port = end_port
-            end_port = buf_begin_port
+            begin_port, end_port = end_port, begin_port
 
         for port in range(begin_port, end_port):
             task = threading.Thread(target=self.scan_thread, args=(ip, port))
-            status_code = task.start()
+            task.start()
 
     def scan_thread(self, ip: str, port: int):
         status = self.scan_ip_port(ip, port)
@@ -57,6 +53,11 @@ class Scaner:
     def parse_ip(self, ip: str) -> list:
         return ip.rsplit('.')
 
+    @staticmethod
+    def exchange(value1, value2):
+        buf_value1 = value1
+        value1 = value2
+        value2 = value1
 
 if __name__ == '__main__':
     start = datetime.now()
