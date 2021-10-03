@@ -1,18 +1,19 @@
-import socket
-import sys
-import threading
-import time
-from datetime import datetime
+import socket  # Импортирование библитотеки для дальнейшего использования
+import sys  # Системная бибилиотека, она нам понадобится, чтобы считывать аргументы из консоли
+import threading  # Это бибилиотека нужно чтобы сделать прослушивание сокета быстрее (для создания потоков)
+from datetime import datetime  # библиотека времемени для того чтобы отсчитывать выполнение программы
 
 
-class Scaner:
-    MAX_SECONDS_TIMEOUT_SOCKET = 2
-    MAX_RANGE_PORT = 65535
+class Scaner:  # Класс где реализованны функции для прослушивания портов
+    MAX_SECONDS_TIMEOUT_SOCKET = 2  # Максимальное кол-во секунд для прослушивания порта
+    # то есть я жду пока мне придет ответ от порта в течениии 2 секунд
+    MAX_RANGE_PORT = 65535  # Ну тут понятно демаю, просто максимальное значение для порта
 
     def scan_ip_range_and_port_range(self, begin_ip: str, end_ip: str, begin_port: int, end_port: int):
-        last_node_in_begin_ip = int(self.get_last_node_in_ip(begin_ip))
+        """Сканирует айпишники в рендже, и порты"""
+        last_node_in_begin_ip = int(self.get_last_node_in_ip(begin_ip))  # перевод поможет
         last_node_in_last_ip = int(self.get_last_node_in_ip(end_ip))
-        if last_node_in_begin_ip > last_node_in_last_ip:
+        if last_node_in_begin_ip > last_node_in_last_ip:  # Проверка на то чтобы начальное значение было меньше чем конечное
             buf_last_node_in_begin_ip = last_node_in_begin_ip
             last_node_in_begin_ip = last_node_in_last_ip
             last_node_in_last_ip = buf_last_node_in_begin_ip
@@ -63,7 +64,8 @@ if __name__ == '__main__':
     start = datetime.now()
     scaner = Scaner()
     if len(sys.argv) - 1 == 4:
-        scaner.scan_ip_range_and_port_range(begin_ip=sys.argv[1], end_ip=sys.argv[2], begin_port=int(sys.argv[3]), end_port=int(sys.argv[4]))
+        scaner.scan_ip_range_and_port_range(begin_ip=sys.argv[1], end_ip=sys.argv[2], begin_port=int(sys.argv[3]),
+                                            end_port=int(sys.argv[4]))
     elif len(sys.argv) - 1 == 3:
         scaner.scan_ip_in_range_port(ip=sys.argv[1], begin_port=int(sys.argv[2]), end_port=int(sys.argv[3]))
     else:
