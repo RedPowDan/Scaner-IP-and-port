@@ -3,9 +3,6 @@ import sys
 import threading
 from datetime import datetime
 
-#from scapy.all import *
-#from scapy.layers.inet import IP, UDP
-
 
 class Scaner:
     MAX_SECONDS_TIMEOUT_SOCKET = 2
@@ -57,12 +54,6 @@ class Scaner:
 
     def parse_ip(self, ip):
         return ip.rsplit('.')
-
-    @staticmethod
-    def exchange(value1, value2):
-        buf_value1 = value1
-        value1 = value2
-        value2 = value1
 
 
 if __name__ == '__main__':
