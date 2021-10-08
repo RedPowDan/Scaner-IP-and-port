@@ -3,6 +3,9 @@ import sys
 import threading
 from datetime import datetime
 
+#from scapy.all import *
+#from scapy.layers.inet import IP, UDP
+
 
 class Scaner:
     MAX_SECONDS_TIMEOUT_SOCKET = 2
@@ -31,21 +34,23 @@ class Scaner:
             task.start()
 
     def scan_thread(self, ip, port):
-        status = self.scan_ip_port(ip, port)
+        status, out_info_about_port = self.scan_ip_port(ip, port)
         if status == 1:
-            print(ip + ':' + str(port), ' its open.')
+            print(ip + ':' + str(port), ' its open.' + 'info -> ' + out_info_about_port)
 
-    def scan_ip_port(self, ip, port):
+    def scan_ip_port(self, ip, port) -> [int, str]:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(self.MAX_SECONDS_TIMEOUT_SOCKET)
         try:
             connect = sock.connect((ip, port))
+            bann = sock.recv(2048)
+            out_info_about_port = bann.decode('utf-8').strip()
             sock.close()
-            return 1
+            return 1, out_info_about_port
         except:
             pass
 
-        return 0
+        return 0, None
 
     def get_last_node_in_ip(self, ip):
         return self.parse_ip(ip)[3]
