@@ -1,12 +1,15 @@
 import socket
 import sys
+import time
 import threading
 from datetime import datetime
+import requests
 
 
 class Scaner:
-    MAX_SECONDS_TIMEOUT_SOCKET = 0.2
+    MAX_SECONDS_TIMEOUT_SOCKET = 1
     MAX_RANGE_PORT = 65535
+    _list_http_ports = [ 80, 443]
     _list_of_messages = []
 
     def scan_ip_range_and_port_range(self, begin_ip, end_ip, begin_port, end_port):
@@ -20,6 +23,7 @@ class Scaner:
             ip = '.'.join(parsed_begin_ip[:3]) + '.' + str(last_node)
             self.scan_ip_in_range_port(ip=ip, begin_port=begin_port, end_port=end_port)
 
+        time.sleep(self.MAX_SECONDS_TIMEOUT_SOCKET)
         self.print_message_list()
 
     def scan_ip_in_range_port(self, ip, begin_port, end_port):
@@ -33,6 +37,7 @@ class Scaner:
             task = threading.Thread(target=self.scan_thread, args=(ip, port))
             task.start()
 
+        time.sleep(self.MAX_SECONDS_TIMEOUT_SOCKET)
         self.print_message_list()
 
     def scan_thread(self, ip, port):
@@ -51,8 +56,10 @@ class Scaner:
                 bytes = sock.recv(1000)
                 out_info_about_port = bytes.decode('utf-8').strip()
             except:
-
-                out_info_about_port = "Not found info"
+                if port in self._list_http_ports:
+                    out_info_about_port = self.get_info_about_port(ip, port)
+                else:
+                    out_info_about_port = "Not found info"
             sock.close()
             return 1, out_info_about_port
         except:
@@ -62,13 +69,21 @@ class Scaner:
 
     def print_message_list(self):
         [print(message) for message in self._list_of_messages]
-        print(len(self._list_of_messages))
 
     def get_last_node_in_ip(self, ip):
         return self.parse_ip(ip)[3]
 
     def parse_ip(self, ip):
         return ip.rsplit('.')
+
+    def get_info_about_port(self, ip, port) -> str:
+        try:
+            response = requests.options(f"http://{ip}:{port}")
+            print(f"{ip}:{port} info -> {response.headers}")
+        except Exception as e:
+            print(e)
+            return "Not found info"
+        return ""
 
 
 if __name__ == '__main__':
@@ -80,6 +95,7 @@ if __name__ == '__main__':
         scaner.scan_ip_in_range_port(ip=sys.argv[1], begin_port=int(sys.argv[2]), end_port=int(sys.argv[3]))
     else:
         scaner.scan_ip_in_range_port(ip='127.0.0.1', begin_port=1, end_port=10000)
+
     ends = datetime.now()
     print('Scan is ended with count seconds : {}'.format(ends - start))
     input()
