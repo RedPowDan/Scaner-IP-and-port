@@ -1,12 +1,11 @@
 import socket
 import sys
 import threading
-import time
 from datetime import datetime
 
 
 class Scaner:
-    MAX_SECONDS_TIMEOUT_SOCKET = 0.5
+    MAX_SECONDS_TIMEOUT_SOCKET = 0.2
     MAX_RANGE_PORT = 65535
     _list_of_messages = []
 
@@ -41,15 +40,18 @@ class Scaner:
         if status == 1:
             self._list_of_messages.append(ip + ':' + str(port) + ' its open.' + 'info -> ' + out_info_about_port)
 
+    # socket.SOCK_STREAM
+    # socket.SOCK_DGRAM
     def scan_ip_port(self, ip, port) -> [int, str]:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(self.MAX_SECONDS_TIMEOUT_SOCKET)
         try:
             connect = sock.connect((ip, port))
             try:
-                bytes = sock.recv(2048)
+                bytes = sock.recv(1000)
                 out_info_about_port = bytes.decode('utf-8').strip()
             except:
+
                 out_info_about_port = "Not found info"
             sock.close()
             return 1, out_info_about_port
@@ -60,6 +62,7 @@ class Scaner:
 
     def print_message_list(self):
         [print(message) for message in self._list_of_messages]
+        print(len(self._list_of_messages))
 
     def get_last_node_in_ip(self, ip):
         return self.parse_ip(ip)[3]
